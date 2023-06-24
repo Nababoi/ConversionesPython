@@ -36,7 +36,7 @@ def App():
             if (addQuestion == "3"):
                 try:
                     moneda = input("Con que moneda comprar desea comprar pesos?\n")   
-                    cantidad = Decimal(input("Ingrese la cantidad de dinero de pesos a comprar\n"))       
+                    cantidad = Decimal(input("Ingrese la cantidad de pesos a comprar\n"))       
                     myadmin.sellCurrMoney(usuario,cantidad,moneda)
                 except Exception as e:
                     print(e.args[0])
