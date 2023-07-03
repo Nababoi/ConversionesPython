@@ -10,5 +10,9 @@
     {
         "contra": "$2b$12$Xie4mHg8ly1PMXPCVXxHpuX02PizOWZmE.TgwafDe4mwWR0.EX3Ri",
         "nombre": "pepe"
+    },
+    {
+        "contra": "$2b$12$gykF78qVSRPoUhy5zGxI1uSegi1AO38UZAZNhw0AZ1TA4o7/ltTFi",
+        "nombre": "prueba"
     }
 ]

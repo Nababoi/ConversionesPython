@@ -38,6 +38,8 @@ class business_helper:
         moneda = moneda.strip().upper()
         if not self.data_helper.isCurrCodeValid(moneda):
             raise Exception("Ingrese un codigo de moneda valido")
+        if not self.data_helper.AccountExist(moneda,cuenta):
+            raise Exception("No tiene una cuenta abierta en esa moneda")
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
         self.data_helper.buyCurrMoney(cuenta,cantidad,moneda)
@@ -46,6 +48,8 @@ class business_helper:
         moneda = moneda.strip().upper()
         if not self.data_helper.isCurrCodeValid(moneda):
             raise Exception("Ingrese un codigo de moneda valido")
+        if not self.data_helper.AccountExist(moneda,cuenta):
+            raise Exception("No tiene una cuenta abierta en esa moneda")
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
         self.data_helper.sellCurrMoney(cuenta,cantidad,moneda)

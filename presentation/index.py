@@ -19,7 +19,7 @@ def App():
         if(operacion == "1"):
             addQuestion = 0
             while(addQuestion != "5"):
-                addQuestion = input("Elija la accion a realizar\n 1-Depositar\n 2-Comprar\n 3-Vender\n 4-Abrir una cuenta\n")
+                addQuestion = input("Elija la accion a realizar\n 1-Depositar\n 2-Comprar\n 3-Vender\n 4-Abrir una cuenta\n 5-Salir\n")
                 if (addQuestion == "1"):
                     try:
                         moneda = input("En que cuenta desea depositar?\n")
@@ -49,30 +49,33 @@ def App():
                         except Exception as e:
                             print(e.args[0])
         elif(operacion == "2"):
-
-            operacionUsuario = input("Que accion desea realizar:\n1-Agregar Usuario\n2-Modificar usuario\n3-Salir\n")
-            while(operacionUsuario != "3"):          
+            operacionUsuario = 1
+            while(operacionUsuario != "3"):
+                operacionUsuario = input("Que accion desea realizar:\n1-Agregar Usuario\n2-Modificar usuario\n3-Salir\n")       
                 if(operacionUsuario == "1"):
-                        try:  
-                            nombre = input("Ingrese su nuevo usuario: ")
-                            contra = getpass.getpass("Ingrese su nueva contraseña: ")
-                            contra2 = getpass.getpass("Ingrese de nuevo su contraseña: ")
+                    try:
+
+                        nombre = input("Ingrese su nuevo usuario: ")
+                        contra = getpass.getpass("Ingrese su nueva contraseña: ")
+                        contra2 = getpass.getpass("Ingrese de nuevo su contraseña: ")
+                                
+                        agr = AgregarAdmin(contra, contra2, nombre)
+                        agr.Agregar()
+                    except Exception as e:
+                        print(e.args[0])
                             
-                            agr = AgregarAdmin(contra, contra2, nombre)
-                            agr.Agregar()
-                        except Exception as e:
-                            print(e.args[0])
-                        
                 elif(operacionUsuario == "2"):
-                        try:
-                            nombre = input("Ingrese el usuario a modificar: ")
-                            contra = getpass.getpass("Ingrese la nueva contraseña: ")
-                            contra2 = getpass.getpass("Ingrese de nuevo la nueva contraseña: ")
+                            try:
+                                nombre = input("Ingrese el usuario a modificar: ")
+                                contra = getpass.getpass("Ingrese la nueva contraseña: ")
+                                contra2 = getpass.getpass("Ingrese de nuevo la nueva contraseña: ")
+                                
+                                Mimod = ModificarAdmin(contra, contra2, nombre)
+                                Mimod.modificar()
+                            except Exception as e:
+                                print(e.args[0])
+
                             
-                            Mimod = ModificarAdmin(contra, contra2, nombre)
-                            Mimod.modificar()
-                        except Exception as e:
-                            print(e.args[0])
     except Exception as e:
         print(e.args[0])
 
