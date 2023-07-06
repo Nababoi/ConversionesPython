@@ -1,4 +1,11 @@
 from data.data_helper import data_helper, Login, Modificador, Agregador
+from currencies import curr
+from os import path
+import json
+import requests as rq
+import bcrypt
+from decimal import Decimal
+from decimal import getcontext
 
 class business_helper:
     username=""
@@ -36,23 +43,86 @@ class business_helper:
 
     def buyCurrMoney(self, cuenta,cantidad, moneda):
         moneda = moneda.strip().upper()
+        getcontext().prec = 100
+
+        self.validaciones(moneda,cuenta,cantidad)
+
+        archivo = str(cuenta) + ".json"
+
+        conexion = self.data_helper.conexionApi(moneda)      
+        cot_Moneda_X = self.data_helper.cotizacionMoneda(conexion,moneda)
+        cot_Moneda_Peso = self.data_helper.cotizacionMoneda(conexion,"ARS")
+        cot_peso_x = cot_Moneda_Peso/cot_Moneda_X
+
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
+
+        saldo_ars = Decimal(cuentas["ARS"])
+        cantidad_A_Comprar = Decimal(cot_peso_x).quantize(Decimal('0.00')) * Decimal(cantidad).quantize(Decimal('0.00'))
+
+        if cantidad_A_Comprar > saldo_ars:
+            raise Exception("No tiene suficiente pesos argentinos para comprar esa moneda")
+
+        total_moneda_x = Decimal(cantidad_A_Comprar).quantize(Decimal('0.00')) / Decimal(cot_peso_x).quantize(Decimal('0.00'))
+
+        if total_moneda_x == 0:
+            raise Exception("No tiene suficientes pesos argentinos para comprar esa moneda")
+
+        cuentas["ARS"] = str(Decimal(saldo_ars) - Decimal(cantidad_A_Comprar))
+
+        if moneda in cuentas:
+            cuentas[moneda] = str(Decimal(cuentas[moneda]) + Decimal(total_moneda_x))
+        else:
+            cuentas[moneda] = str(total_moneda_x)
+
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
+
+        # self.data_helper.buyCurrMoney(cuenta,cantidad,moneda)
+
+    def validaciones(self,moneda,cuenta,cantidad):
         if not self.data_helper.isCurrCodeValid(moneda):
             raise Exception("Ingrese un codigo de moneda valido")
         if not self.data_helper.AccountExist(moneda,cuenta):
             raise Exception("No tiene una cuenta abierta en esa moneda")
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
-        self.data_helper.buyCurrMoney(cuenta,cantidad,moneda)
+        # self.data_helper.buyCurrMoney(cuenta,cantidad,moneda)
 
     def sellCurrMoney(self, cuenta,cantidad, moneda):
         moneda = moneda.strip().upper()
-        if not self.data_helper.isCurrCodeValid(moneda):
-            raise Exception("Ingrese un codigo de moneda valido")
-        if not self.data_helper.AccountExist(moneda,cuenta):
-            raise Exception("No tiene una cuenta abierta en esa moneda")
-        if (cantidad <= 0):
-            raise Exception("Ingrese una cantidad valida")
-        self.data_helper.sellCurrMoney(cuenta,cantidad,moneda)
+        getcontext().prec = 100
+
+        self.validaciones(moneda,cuenta,cantidad)
+
+        conexion = self.data_helper.conexionApi(moneda)      
+        cot_Moneda_X = self.data_helper.cotizacionMoneda(conexion,moneda)
+        cot_Moneda_Peso = self.data_helper.cotizacionMoneda(conexion,"ARS")
+        cot_peso_x = cot_Moneda_X/cot_Moneda_Peso
+
+        archivo = f"{cuenta}.json"
+        
+        with open(archivo, "r") as f:
+            cuenta = json.load(f)
+
+        saldo_X = Decimal(cuenta[moneda])
+
+        cantidad_A_acreditar = cot_peso_x * Decimal(cantidad)
+
+        if Decimal(cantidad) > saldo_X:
+            raise Exception("El saldo no es suficiente")
+
+        saldo_restante = saldo_X - Decimal(cantidad)
+        cuenta[moneda] = "{:.2f}".format(saldo_restante)
+
+        saldo_restante = (Decimal(cuenta['ARS']) + cantidad_A_acreditar)
+        cuenta['ARS'] = "{:.2f}".format(saldo_restante)
+
+        with open(archivo, "w") as f:
+            json.dump(cuenta, f, indent=4)
+        
+        raise Exception("Operacion exitosa")
+        # self.data_helper.sellCurrMoney(cuenta,cantidad,moneda)
 
 #SECCION DEL LOGIN
 
