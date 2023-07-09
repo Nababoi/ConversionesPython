@@ -46,126 +46,39 @@ class data_helper:
         with open(filename,"w") as f:
             accounts_ser = json.dumps(accounts_des,indent=4)
             f.write(accounts_ser)
-            
-    def maxMoneyAccount(self, cuenta, moneda, cantidad):
+
+    def getJson(self,cuenta):
         archivo = cuenta + ".json"
+        return archivo
+
+    def maxMoneyAccount(self, cuenta, moneda, cantidad):
+        archivo = self.getJson(cuenta)
         with open(archivo, "r") as f:
             cuentas = json.load(f)
 
         if moneda in cuentas:
-            saldo = Decimal(cuentas[moneda])  # Convertir a Decimal
-            if saldo + Decimal(cantidad) > Decimal("20000.00"):  # Convertir a Decimal
+            saldo = Decimal(cuentas[moneda]) 
+            if saldo + Decimal(cantidad) > Decimal("20000.00"): 
                 return False
         return True
 
-
-
-    def addMoney(self, cuenta, moneda, cantidad):
-        archivo = cuenta + ".json"
-        with open(archivo, "r") as f:
+    def leerArchivo(self,operacion, archivo):
+        with open(archivo, operacion) as f:
             cuentas = json.load(f)
+        return cuentas 
 
-        # if self.maxMoneyAccount(cuenta, moneda, cantidad) == False:
-        #     return False
-        # if self.isCurrCodeValid(moneda) == False:
-        #     return False
-        # if self.AccountExist(moneda, cuenta) == False:
-        #     return False
-
-        cantidad_decimal = Decimal(str(cantidad))
-        cuentas[moneda] = str(Decimal(cuentas[moneda]) + cantidad_decimal)
-
-        with open(archivo, "w") as f:
-            json.dump(cuentas, f, indent=4)
-
-    
-    def buyCurrMoney(self, cuenta, cantidad, moneda):
-        url = f"http://data.fixer.io/api/latest?access_key=74669fd726cfe6800dc093693542d376&symbols=ARS,{moneda}"
-        response = rq.get(url)
-        res_json = response.json()
-
-        cot_peso_x = Decimal(res_json['rates']['ARS']) / Decimal(res_json['rates'][moneda])
-        archivo = str(cuenta) + ".json"
-
-        with open(archivo, "r") as f:
-            cuentas = json.load(f)
-
-        if not self.isCurrCodeValid(moneda):
-            return False
-
-        saldo_ars = Decimal(cuentas["ARS"])
-        cantidad_A_Comprar = Decimal(cot_peso_x).quantize(Decimal('0.00')) * Decimal(cantidad).quantize(Decimal('0.00'))
-
-        if cantidad_A_Comprar > saldo_ars:
-            raise Exception("No tiene suficiente pesos argentinos para comprar esa moneda")
-
-        total_moneda_x = Decimal(cantidad_A_Comprar).quantize(Decimal('0.00')) / Decimal(cot_peso_x).quantize(Decimal('0.00'))
-
-        if total_moneda_x == 0:
-            raise Exception("No tiene suficientes pesos argentinos para comprar esa moneda")
-
-        cuentas["ARS"] = str(Decimal(saldo_ars) - Decimal(cantidad_A_Comprar))
-
-        if moneda in cuentas:
-            cuentas[moneda] = str(Decimal(cuentas[moneda]) + Decimal(total_moneda_x))
-        else:
-            cuentas[moneda] = str(total_moneda_x)
-
-        with open(archivo, "w") as f:
-            json.dump(cuentas, f, indent=4)
-
-    # def leerArchivo(self,cuenta, archivo):
-    #     # archivo = f"{cuenta}.json"
-    #     with open(archivo, "r") as f:
-    #         cuenta = json.load(f)
-    #     return cuenta
+    def EscribirArchivo(self,operacion, archivo, cuentas):
+        with open(archivo, operacion) as f:
+            json.dump(cuentas, f, indent=4)                     
 
     def conexionApi(self,moneda):
-        url = f"http://data.fixer.io/api/latest?access_key=74669fd726cfe6800dc093693542d376&symbols=ARS,{moneda}"
+        url = f"http://data.fixer.io/api/latest?access_key=27bc953cfda45f1f9fa6131efa757947&symbols=ARS,{moneda}"
         response = rq.get(url)
         res_json = response.json()
         return res_json
 
     def cotizacionMoneda(self,datos,moneda):
         return Decimal(datos['rates'][moneda])
-        
-
-    # def sellCurrMoney(self, cuenta, cantidad, moneda):
-    #     getcontext().prec = 100
-    #     url = f"http://data.fixer.io/api/latest?access_key=74669fd726cfe6800dc093693542d376&symbols=ARS,{moneda}"
-    #     response = rq.get(url)
-    #     res_json = response.json()
-
-       
-    #     a=Decimal(res_json['rates'][moneda])
-    #     b=Decimal(res_json['rates']['ARS'])  
-    #     cot_peso_x = b/a
-    #     print(cot_peso_x)
-    #     archivo = f"{cuenta}.json"
-        
-    #     with open(archivo, "r") as f:
-    #         cuenta = json.load(f)
-
-    #     if moneda not in cuenta:
-    #         raise Exception("No posee la cuenta origen")
-
-    #     saldo_X = Decimal(cuenta[moneda])
-
-    #     cantidad_A_acreditar = cot_peso_x * Decimal(cantidad)
-
-    #     if Decimal(cantidad) > saldo_X:
-    #         raise Exception("El saldo no es suficiente")
-
-    #     saldo_restante = saldo_X - Decimal(cantidad)
-    #     cuenta[moneda] = "{:.2f}".format(saldo_restante)
-
-    #     saldo_restante = (Decimal(cuenta['ARS']) + cantidad_A_acreditar)
-    #     cuenta['ARS'] = "{:.2f}".format(saldo_restante)
-
-    #     with open(archivo, "w") as f:
-    #         json.dump(cuenta, f, indent=4)
-        
-    #     raise Exception("Operacion exitosa")
 
 #SECCION DEL LOGIN
 class Login:
