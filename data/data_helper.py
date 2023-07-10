@@ -72,7 +72,7 @@ class data_helper:
             json.dump(cuentas, f, indent=4)                     
 
     def conexionApi(self,moneda):
-        url = f"http://data.fixer.io/api/latest?access_key=27bc953cfda45f1f9fa6131efa757947&symbols=ARS,{moneda}"
+        url = f"http://data.fixer.io/api/latest?access_key=97cc43ec9cb1b4b97ec48721de3b4c6b&symbols=ARS,{moneda}"
         response = rq.get(url)
         res_json = response.json()
         return res_json

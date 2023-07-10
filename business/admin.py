@@ -29,7 +29,7 @@ class business_helper:
 
     def addMoney(self,cuenta,moneda,cantidad):
         moneda = moneda.strip().upper()
-
+        
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
         if not self.data_helper.maxMoneyAccount(cuenta,moneda,cantidad):
@@ -86,13 +86,14 @@ class business_helper:
             raise Exception("No tiene una cuenta abierta en esa moneda")
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
+        if (moneda == "ARS"):
+            raise Exception("No puede comprar pesos argentinos con la misma moneda")
 
     def sellCurrMoney(self, cuenta,cantidad, moneda):
         moneda = moneda.strip().upper()
         getcontext().prec = 100
 
         self.validaciones(moneda,cuenta,cantidad)
-
         conexion = self.data_helper.conexionApi(moneda)      
         cot_Moneda_X = self.data_helper.cotizacionMoneda(conexion,moneda)
         cot_Moneda_Peso = self.data_helper.cotizacionMoneda(conexion,"ARS")
