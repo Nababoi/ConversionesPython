@@ -1,5 +1,4 @@
 from business.admin import business_helper, Verificacion, ModificarAdmin, AgregarAdmin
-from data.data_helper import data_helper, Login
 import getpass
 from decimal import Decimal
 
@@ -23,7 +22,7 @@ def App():
                 if (addQuestion == "1"):
                     try:
                         moneda = input("En que cuenta desea depositar?\n")
-                        cantidad = Decimal(input("Ingrese la cantidad a depositar\n"))
+                        cantidad = input("Ingrese la cantidad a depositar\n")
                         myadmin.addMoney(usuario,moneda,cantidad)
                     except Exception as e:
                         print(e.args[0])

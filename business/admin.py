@@ -1,18 +1,17 @@
 from data.data_helper import data_helper, Login, Modificador, Agregador
-from currencies import curr
 from os import path
 import json
 import requests as rq
-import bcrypt
 from decimal import Decimal
+import decimal
 from decimal import getcontext
+
 
 class business_helper:
     username=""
     logged=False
 
     def __init__(self):
-        # self.username = username
         self.logged = True
         self.data_helper = data_helper()
         
@@ -29,7 +28,15 @@ class business_helper:
 
     def addMoney(self,cuenta,moneda,cantidad):
         moneda = moneda.strip().upper()
-        
+
+        try:
+            cantidad = Decimal(cantidad)
+        except Exception as ex:
+            raise Exception("Solo se pueden ingresar numeros")
+
+        if(moneda != "ARS"):
+            raise Exception("Solo puede ingresar dinero en la cuenta en pesos Argentinos")
+       
         if (cantidad <= 0):
             raise Exception("Ingrese una cantidad valida")
         if not self.data_helper.maxMoneyAccount(cuenta,moneda,cantidad):
@@ -40,12 +47,15 @@ class business_helper:
             raise Exception("No tiene una cuenta abierta con esa moneda")
 
         archivo = self.data_helper.getJson(cuenta)
-        cuentas = self.data_helper.leerArchivo("r",archivo)
+
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
 
         cantidad_decimal = Decimal(str(cantidad))
         cuentas[moneda] = str(Decimal(cuentas[moneda]) + cantidad_decimal)
         
-        self.data_helper.EscribirArchivo("w",archivo,cuentas)
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
 
     def buyCurrMoney(self, cuenta,cantidad, moneda):
         moneda = moneda.strip().upper()
@@ -61,8 +71,8 @@ class business_helper:
         cot_peso_x = cot_Moneda_Peso/cot_Moneda_X
 
 
-        cuentas = self.data_helper.leerArchivo("r",archivo)
-
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
         saldo_ars = Decimal(cuentas["ARS"])
         cantidad_A_Comprar = Decimal(cot_peso_x).quantize(Decimal('0.00')) * Decimal(cantidad).quantize(Decimal('0.00'))
 
@@ -77,7 +87,8 @@ class business_helper:
         cuentas["ARS"] = str(Decimal(saldo_ars) - Decimal(cantidad_A_Comprar))
         cuentas[moneda] = str(Decimal(cuentas[moneda]) + Decimal(total_moneda_x))
 
-        self.data_helper.EscribirArchivo("w",archivo,cuentas)
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
 
     def validaciones(self,moneda,cuenta,cantidad):
         if not self.data_helper.isCurrCodeValid(moneda):
@@ -100,8 +111,8 @@ class business_helper:
         cot_peso_x = cot_Moneda_Peso/cot_Moneda_X
         archivo = self.data_helper.getJson(cuenta)
 
-        cuenta = self.data_helper.leerArchivo("r",archivo)
-
+        with open(archivo, "r") as f:
+            cuenta = json.load(f)
         saldo_X = Decimal(cuenta[moneda])
 
         cantidad_A_acreditar = cot_peso_x * Decimal(cantidad)
@@ -115,7 +126,8 @@ class business_helper:
         saldo_restante = (Decimal(cuenta['ARS']) + cantidad_A_acreditar)
         cuenta['ARS'] = "{:.2f}".format(saldo_restante)
 
-        self.data_helper.EscribirArchivo("w",archivo,cuenta)
+        with open(archivo, "w") as f:
+            json.dump(cuenta, f, indent=4)
         raise Exception("Operacion exitosa")
 
 #SECCION DEL LOGIN
@@ -131,7 +143,6 @@ class Verificacion:
             MyVeri = Login() 
             contraV, nombreV = MyVeri.ContraNombre(self.contra, self.nombre)
             if(contraV == self.contra and nombreV == self.nombre):
-                # raise Exception("Hubo matchRaise")
                 return True
             else:
                 raise Exception("Datos incorrectos")
@@ -146,11 +157,9 @@ class AgregarAdmin:
         MiAg = Agregador()
         AgrVar = MiAg.agregar(self.contra, self.contra2, self.nombre)
         if(AgrVar):
-                # print("Se agrego")
             raise Exception("Se agrego")
         else:
             raise Exception("Las contraseñas no coinciden")
-                # print("Las contraseñas no coinciden")
             
 class ModificarAdmin:
     def __init__(self,contra,contra2,nombre):
