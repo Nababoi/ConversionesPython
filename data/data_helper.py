@@ -62,15 +62,6 @@ class data_helper:
                 return False
         return True
 
-    def leerArchivo(self,operacion, archivo):
-        with open(archivo, operacion) as f:
-            cuentas = json.load(f)
-        return cuentas 
-
-    def EscribirArchivo(self,operacion, archivo, cuentas):
-        with open(archivo, operacion) as f:
-            json.dump(cuentas, f, indent=4)                     
-
     def conexionApi(self,moneda):
         url = f"http://data.fixer.io/api/latest?access_key=97cc43ec9cb1b4b97ec48721de3b4c6b&symbols=ARS,{moneda}"
         response = rq.get(url)

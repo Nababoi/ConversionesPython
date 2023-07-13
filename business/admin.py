@@ -70,7 +70,6 @@ class business_helper:
         cot_Moneda_Peso = self.data_helper.cotizacionMoneda(conexion,"ARS")
         cot_peso_x = cot_Moneda_Peso/cot_Moneda_X
 
-
         with open(archivo, "r") as f:
             cuentas = json.load(f)
         saldo_ars = Decimal(cuentas["ARS"])
