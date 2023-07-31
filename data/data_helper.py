@@ -4,7 +4,8 @@ import json
 import requests as rq
 import bcrypt
 from decimal import Decimal
-from decimal import getcontext
+# from decimal import getcontext
+import os
 
 class data_helper:
 
@@ -51,6 +52,32 @@ class data_helper:
         archivo = cuenta + ".json"
         return archivo
 
+    def getUsuario(self, user):
+        archivo = user + ".json"
+        if os.path.exists(archivo):
+            with open(archivo, "r") as f:
+                datos_usuario = json.load(f)
+            return datos_usuario.get("usuario")
+
+    def getSaldo(self,moneda,user):
+        archivo = self.getJson(user)
+        with open(archivo, "r") as f:
+            cuenta = json.load(f)
+        saldo_X = Decimal(cuenta[moneda])
+        return saldo_X
+
+    def addMoney(self,cuenta,moneda,cantidad):
+        archivo = self.getJson(cuenta)
+
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
+
+        cantidad_decimal = Decimal(str(cantidad))
+        cuentas[moneda] = str(Decimal(cuentas[moneda]) + cantidad_decimal)
+        
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
+
     def maxMoneyAccount(self, cuenta, moneda, cantidad):
         archivo = self.getJson(cuenta)
         with open(archivo, "r") as f:
@@ -62,8 +89,42 @@ class data_helper:
                 return False
         return True
 
+    def getSaldo(self,moneda,user):
+        archivo = self.getJson(user)
+        with open(archivo, "r") as f:
+            cuenta = json.load(f)
+        saldo_X = Decimal(cuenta[moneda])
+        return saldo_X
+
+    def desacreditar_Dinero(self, saldo, monto, moneda, usuario):
+        saldo = self.getSaldo(moneda, usuario)        
+        archivo = usuario + ".json"
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
+
+        saldoTotal = Decimal(saldo) - Decimal(monto)
+        cuentas[moneda] = "{:.2f}".format(saldoTotal)  # Actualiza el saldo de la moneda con 2 decimales
+
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
+
+    def acreditar_Dinero(self, saldo, monto, moneda, usuario):
+        saldo = self.getSaldo(moneda, usuario)        
+        archivo = usuario + ".json"
+        with open(archivo, "r") as f:
+            cuentas = json.load(f)
+
+        saldoTotal = Decimal(saldo) + Decimal(monto)
+        cuentas[moneda] = "{:.2f}".format(saldoTotal)  # Actualiza el saldo de la moneda con 2 decimales
+
+        with open(archivo, "w") as f:
+            json.dump(cuentas, f, indent=4)
+
+
     def conexionApi(self,moneda):
-        url = f"http://data.fixer.io/api/latest?access_key=97cc43ec9cb1b4b97ec48721de3b4c6b&symbols=ARS,{moneda}"
+        
+        # url = f"http://data.fixer.io/api/latest?access_key=27bc953cfda45f1f9fa6131efa757947&symbols=ARS,{moneda}"
+        url = f"http://data.fixer.io/api/latest?access_key=17d5c13ee70b7ca3cf18d12c8be1b96f&symbols=ARS,{moneda}"
         response = rq.get(url)
         res_json = response.json()
         return res_json
@@ -72,7 +133,7 @@ class data_helper:
         return Decimal(datos['rates'][moneda])
 
 #SECCION DEL LOGIN
-class Login:
+class Administrador:
     def __init__(self):
         self.filepath="usuarios.json" 
         
@@ -88,11 +149,6 @@ class Login:
                         return contra, nombre
         return None, None
 
-
-class Agregador:
-    def __init__(self):
-        self.filepath = "usuarios.json"
-        
     def agregar(self,contra,contra2,nombre):
         if contra == contra2:
                 with open(self.filepath, 'r') as f:  
@@ -121,11 +177,6 @@ class Agregador:
         else:
                 return False
 
-class Modificador():
-    
-    def __init__(self):
-        self.filepath = 'usuarios.json'
-
     def modificar(self,contra,contra2,nombre):
         with open(self.filepath, 'r') as f:
             serObj = f.read()
@@ -140,7 +191,6 @@ class Modificador():
                     contra_hash = bcrypt.hashpw(contra.encode("utf-8"), bcrypt.gensalt())
                     item["contra"] = contra_hash.decode("utf-8")
                     ok = True
-
         if ok:
             with open(self.filepath, "w") as f:
                 json.dump(data, f, indent=4)
