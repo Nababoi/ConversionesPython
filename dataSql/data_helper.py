@@ -66,7 +66,8 @@ class Administrador:
                 if(nombre == usuario_encontrado.usuario):
                     if(pwd == contra2):
                         usuario_encontrado.contra = nueva_contra
-                return True       
+                        return True
+                return False       
             except SO.SQLObjectNotFound:
                 return False
             

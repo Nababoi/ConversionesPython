@@ -14,5 +14,13 @@
     {
         "contra": "$2b$12$GVeyOP4pibUC7Pt.vupsbe0vUZZEhgO1KvFBLoae11ouiMMn6ehES",
         "nombre": "prueba"
+    },
+    {
+        "contra": "$2b$12$b623uriLpuqKtH5Nw11fTOZXww5Uoj1qf5jfcK0iNUxwiTbEMXKuO",
+        "nombre": "manu"
+    },
+    {
+        "contra": "$2b$12$k8uCpemAPdl7tavqpd4Jt.RgI9gbeJtvSYwIaQP1HQjJCsee4SnZG",
+        "nombre": "11"
     }
 ]

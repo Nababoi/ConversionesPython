@@ -44,14 +44,16 @@ def App():
                         if (addQuestion == "2"):
                             try:
                                 moneda = input("Que moneda desea comprar?\n")
-                                cantidad = input("Ingrese la cantidad de dinero\n")       
+                                # cantidad = input("Ingrese la cantidad de dinero\n")   
+                                cantidad = input(f"Ingrese la cantidad de {moneda} a comprar\n")                                    
+    
                                 myadmin.buyCurrMoney(usuario,cantidad,moneda)
                             except Exception as e:
                                 print(e.args[0])
                         if (addQuestion == "3"):
                             try:
                                 moneda = input("Con que moneda comprar desea comprar pesos?\n")   
-                                cantidad = input("Ingrese la cantidad a comprar\n")    
+                                cantidad = input(f"Ingrese la cantidad de {moneda} a vender\n")                                    
                                 myadmin.sellCurrMoney(usuario,cantidad,moneda)
                             except Exception as e:
                                 print(e.args[0])

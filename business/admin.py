@@ -1,4 +1,4 @@
-from dataSql.data_helper import Administrador, data_helper
+from data.data_helper import Administrador, data_helper
 
 # from os import path
 # import json
